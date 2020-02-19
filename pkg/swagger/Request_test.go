@@ -8,18 +8,18 @@ import (
 
 
 func Test_Request_Parameter_append_single(t *testing.T) {
-	var paramList = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
 	var param = NewMethodParameter()
 	param.Name = "test01"
 	paramList.Append(param)
 
-	assert.Equal(t, 1, len(paramList), "Unable Append RequestGetParameterList")
-	assert.Equal(t, param.Name, paramList[0].Name, "Unable Append RequestGetParameterList - unknown value added")
+	assert.Equal(t, 1, len(paramList), "Unable Append RequestParameterList")
+	assert.Equal(t, param.Name, paramList[0].Name, "Unable Append RequestParameterList - unknown value added")
 }
 
 
 func Test_Request_Parameter_append_multiple(t *testing.T) {
-	var paramList = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
 	var testList []MethodGetParameter
 	for i := 0; i < 10; i++ {
 		var param = NewMethodParameter()
@@ -30,13 +30,13 @@ func Test_Request_Parameter_append_multiple(t *testing.T) {
 
 	assert.Equal(t, len(testList), len(paramList), "After add elements not all added")
 	for index, param := range testList {
-		assert.Equal(t, param.Name, paramList[index].Name, "Unable Append RequestGetParameterList - unknown value added")
+		assert.Equal(t, param.Name, paramList[index].Name, "Unable Append RequestParameterList - unknown value added")
 	}
 }
 
 
 func Test_Request_Parameter_IndexOf_Found(t *testing.T) {
-	var paramList = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
 	var testList []MethodGetParameter
 	for i := 0; i < 10; i++ {
 		var param = NewMethodParameter()
@@ -48,13 +48,13 @@ func Test_Request_Parameter_IndexOf_Found(t *testing.T) {
 
 	assert.Equal(t, len(testList), len(paramList), "After add elements not all added")
 	for index, param := range testList {
-		assert.Equal(t, index, paramList.IndexOf(param.Name, param.In), "Unable find parameter using RequestGetParameterList.IndexOf")
+		assert.Equal(t, index, paramList.IndexOf(param.Name, param.In), "Unable find parameter using RequestParameterList.IndexOf")
 	}
 }
 
 
 func Test_Request_Parameter_IndexOf_NotFound(t *testing.T) {
-	var paramList = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
 	var testList []MethodGetParameter
 	for i := 0; i < 10; i++ {
 		var param = NewMethodParameter()
@@ -70,8 +70,8 @@ func Test_Request_Parameter_IndexOf_NotFound(t *testing.T) {
 
 
 func Test_Request_Parameter_merge_into_empty(t *testing.T) {
-	var paramList = RequestGetParameterList{}
-	var inject = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
+	var inject = RequestParameterList{}
 	inject = paramListAddParam(inject, "test", SWAGGER_PARAM_IN_QUERY)
 
 	paramList.Merge(inject)
@@ -80,8 +80,8 @@ func Test_Request_Parameter_merge_into_empty(t *testing.T) {
 
 
 func Test_Request_Parameter_merge_new_into_not_empty(t *testing.T) {
-	var paramList = RequestGetParameterList{}
-	var inject = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
+	var inject = RequestParameterList{}
 	inject = paramListAddParam(inject, "test", SWAGGER_PARAM_IN_QUERY)
 	paramList = paramListAddParam(paramList, "exists", SWAGGER_PARAM_IN_QUERY)
 
@@ -92,8 +92,8 @@ func Test_Request_Parameter_merge_new_into_not_empty(t *testing.T) {
 
 
 func Test_Request_Parameter_merge_exists_parameter(t *testing.T) {
-	var paramList = RequestGetParameterList{}
-	var inject = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
+	var inject = RequestParameterList{}
 	inject = paramListAddParam(inject, "test", SWAGGER_PARAM_IN_QUERY)
 	paramList = paramListAddParam(paramList, "other!value", SWAGGER_PARAM_IN_QUERY)
 	paramList = paramListAddParam(paramList, "test", SWAGGER_PARAM_IN_QUERY)
@@ -105,8 +105,8 @@ func Test_Request_Parameter_merge_exists_parameter(t *testing.T) {
 
 
 func Test_Request_Parameter_merge_not_required_parameter(t *testing.T) {
-	var paramList = RequestGetParameterList{}
-	var inject = RequestGetParameterList{}
+	var paramList = RequestParameterList{}
+	var inject = RequestParameterList{}
 	inject = paramListAddParam(inject, "test", SWAGGER_PARAM_IN_QUERY)
 	paramList = paramListAddParam(paramList, "not_required", SWAGGER_PARAM_IN_QUERY)
 	paramList = paramListAddParam(paramList, "test", SWAGGER_PARAM_IN_QUERY)
@@ -118,7 +118,7 @@ func Test_Request_Parameter_merge_not_required_parameter(t *testing.T) {
 }
 
 
-func paramListAddParam(paramList RequestGetParameterList, name, in string) RequestGetParameterList {
+func paramListAddParam(paramList RequestParameterList, name, in string) RequestParameterList {
 	var param = NewMethodParameter()
 	param.Name = name
 	param.In = in

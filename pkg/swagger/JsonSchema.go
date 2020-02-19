@@ -5,7 +5,7 @@ import (
 )
 
 type JsonSchemaProperty struct {
-	Type interface{}                          `json:"type"`
+	Type interface{}                         `json:"type"`
 	TypeList map[int]int                     `json:"-"`
 	Items interface{}                        `json:"items,,omitempty"`
 	Properties map[string]JsonSchemaProperty `json:"properties,,omitempty"`

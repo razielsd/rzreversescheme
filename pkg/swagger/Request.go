@@ -2,11 +2,12 @@ package swagger
 
 type RequestMethod struct {
 	MethodName string                        `json:"-"`
-	Parameters RequestGetParameterList       `json:"parameters,omitempty"`
+	Consumes   []string                      `json:"consumes,omitempty"`
+	Parameters RequestParameterList          `json:"parameters,omitempty"`
 	Responses  map[int]SwaggerMethodResponse `json:"responses"`
 }
 
-type RequestGetParameterList []MethodGetParameter
+type RequestParameterList []MethodGetParameter
 
 
 type MethodGetParameter struct {
@@ -33,7 +34,7 @@ func NewMethodParameter() MethodGetParameter {
 }
 
 
-func (req *RequestGetParameterList) Merge(paramList RequestGetParameterList) {
+func (req *RequestParameterList) Merge(paramList RequestParameterList) {
 	if len(*req) == 0 {
 		for _, param := range paramList {
 			req.Append(param)
@@ -55,12 +56,12 @@ func (req *RequestGetParameterList) Merge(paramList RequestGetParameterList) {
 }
 
 
-func (req *RequestGetParameterList) Append(param MethodGetParameter) {
+func (req *RequestParameterList) Append(param MethodGetParameter) {
 	*req = append(*req, param)
 }
 
 
-func (req *RequestGetParameterList) IndexOf (paramName, in string) int {
+func (req *RequestParameterList) IndexOf (paramName, in string) int {
 	for index, v := range *req {
 		if (paramName == v.Name) && (in == v.In) {
 			return index;

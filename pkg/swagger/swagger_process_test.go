@@ -20,7 +20,6 @@ func Test_Swagger_Empty_Data(t *testing.T) {
 }
 
 
-
 func Test_Swagger_Add_Request_Get_Without_Parameters(t *testing.T) {
 	var clientReq = createGetClientReq("/get/one")
 	var proc = NewSwaggerProcessor()
@@ -37,7 +36,7 @@ func Test_Swagger_Add_Request_Get_Without_Parameters(t *testing.T) {
 			  "get": {
 				"responses": {
 				  "200": {
-					"description": "Status 200",
+					"description": "Status 200 OK",
 					"schema": {
 					  "type": "object",
 					  "properties": {
@@ -84,7 +83,7 @@ func Test_Swagger_Add_Request_Get_With_QueryParameters_String(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -131,7 +130,7 @@ func Test_Swagger_Add_Request_Get_With_QueryParameters_Int(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -177,7 +176,7 @@ func Test_Swagger_Add_Request_Get_With_QueryParameters_float(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -215,7 +214,7 @@ func Test_Swagger_Add_Request_Post_Without_Parameters(t *testing.T) {
 			  "post": {
 				"responses": {
 				  "200": {
-					"description": "Status 200",
+					"description": "Status 200 OK",
 					"schema": {
 					  "type": "object",
 					  "properties": {
@@ -264,7 +263,7 @@ func Test_Swagger_Add_Request_Post_With_FormParameters_String(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -313,7 +312,7 @@ func Test_Swagger_Add_Request_Post_With_FormParameters_Int(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -362,7 +361,7 @@ func Test_Swagger_Add_Request_Post_With_FormParameters_float(t *testing.T) {
 			  ],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 				  "type": "object",
 				  "properties": {
@@ -455,7 +454,7 @@ func Test_Swagger_Add_Request_Post_With_JsonBody(t *testing.T) {
 			],
 			"responses": {
 			  "200": {
-				"description": "Status 200",
+				"description": "Status 200 OK",
 				"schema": {
 					"type": "object",
 					"properties": {

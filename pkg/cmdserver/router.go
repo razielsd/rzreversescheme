@@ -14,6 +14,6 @@ func createRouter() *gin.Engine {
 
 	r.GET("/status", handlerStatus)
 	r.GET("/schema/:host", handlerSchema)
-
+	r.POST("/configure/host", handlerConfigureHost)
 	return r
 }

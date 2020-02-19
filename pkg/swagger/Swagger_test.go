@@ -32,7 +32,7 @@ func Test_Swagger_hasPath_Exists(t *testing.T) {
 	var requestUri string = "/my/test/path"
 
 	var reqMethod = NewRequestMethod()
-	var methodName = "GET"
+	var methodName = http.MethodGet
 	proc.doc.Path[requestUri] = make(map[string]RequestMethod)
 	proc.doc.Path[requestUri][methodName] = reqMethod
 
@@ -63,10 +63,10 @@ func createGetClientReq(url string) core.ClientRequest {
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.RequestURI = "/get/one"
-	req.Method = "GET"
+	req.Method = http.MethodGet
 	clientReq.Request = *req
 	clientReq.Response.Body = `{"id": 40, "username": "Vasya"}`
-	clientReq.Response.StatusCode = 200
+	clientReq.Response.StatusCode = http.StatusOK
 	return clientReq
 }
 
@@ -82,10 +82,10 @@ func createPostClientReq(reqUrl string, params map[string]string) core.ClientReq
 	req, _ := http.NewRequest("POST", reqUrl, bytes.NewBufferString(formData.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
 	req.RequestURI = "/get/one"
-	req.Method = "POST"
+	req.Method = http.MethodPost
 	clientReq.Request = *req
 	clientReq.Response.Body = `{"id": 40, "username": "Vasya"}`
-	clientReq.Response.StatusCode = 200
+	clientReq.Response.StatusCode = http.StatusOK
 	return clientReq
 }
 
@@ -95,12 +95,12 @@ func createPostClientReqJson(reqUrl string, body string) core.ClientRequest {
 	var clientReq = core.ClientRequest{}
 
 	req, _ := http.NewRequest("POST", reqUrl, bytes.NewBufferString(body))
-
-	req.RequestURI = "/get/one"
-	req.Method = "POST"
+	urlObj, _ := url.Parse(reqUrl)
+	req.RequestURI = urlObj.RequestURI()
+	req.Method = http.MethodPost
 	clientReq.Request = *req
 	clientReq.Response.Body = `{"id": 40, "username": "Vasya"}`
-	clientReq.Response.StatusCode = 200
+	clientReq.Response.StatusCode = http.StatusOK
 	return clientReq
 }
 

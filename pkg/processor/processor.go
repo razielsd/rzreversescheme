@@ -20,9 +20,12 @@ var clientChan chan core.ClientRequest
 var procList map[string]IApiProcessor
 var procMutex = &sync.Mutex{}
 
+var HostMatcherService HostMatcher
+
 func Init()  {
 	clientChan = make(chan core.ClientRequest, 100)
 	procList = make(map[string]IApiProcessor)
+	HostMatcherService = NewHostMatcher()
 	go worker(clientChan)
 }
 
@@ -64,7 +67,7 @@ func processClientRequest(clientReq core.ClientRequest) {
 
 
 func getProcessor(clientReq core.ClientRequest) IApiProcessor  {
-	var host = extractHost(clientReq.Request.Host)
+	var host = HostMatcherService.GetHost(clientReq.Request)
 	fmt.Printf("Get for host: %s\n", host)
 	var contentType = strings.ToLower(clientReq.Response.Header.Get("content-type"))
 	var skipTypeList = [3]string{"image", "video", "audio"}
@@ -86,15 +89,4 @@ func getProcessor(clientReq core.ClientRequest) IApiProcessor  {
 		return proc
 	}
 	return nil
-}
-
-/**
-  Drop port number for test,
- */
-func extractHost(host string) string  {
-	var index = strings.Index(host, ":")
-	if index > 0 {
-		host = host[0:index]
-	}
-	return host
 }
