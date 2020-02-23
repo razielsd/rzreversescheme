@@ -9,6 +9,7 @@ import (
 	"rzreversescheme/pkg/core"
 	"rzreversescheme/pkg/format"
 	"strings"
+	"sync"
 )
 
 type SwaggerDoc struct {
@@ -18,14 +19,11 @@ type SwaggerDoc struct {
 }
 
 
-type SwaggerMethodResponse struct {
-	Description string	`json:"description"`
-	Schema JsonSchemaProperty `json:"schema"`
-}
 
 
 type SwaggerProcessor struct {
 	doc SwaggerDoc
+	lock sync.RWMutex
 }
 
 
@@ -37,12 +35,6 @@ func NewSwaggerProcessor() SwaggerProcessor {
 	proc.doc.Info["title"] = "rzreversescheme - swagger scheme generator"
 	proc.doc.Info["version"] = "0.0.1a"
 	return proc
-}
-
-
-func NewSwaggerMethodResponse() SwaggerMethodResponse {
-	var resp = SwaggerMethodResponse{}
-	return resp
 }
 
 
@@ -170,7 +162,7 @@ func (proc SwaggerProcessor) processPostForm(clientReq core.ClientRequest) Reque
 	var paramList = RequestParameterList{}
 	err := clientReq.Request.ParseForm()
 	if err != nil {
-		return paramList //can't and to nothing, may bad way, but better no idea
+		return paramList //can't and to nothing, may be bad way, but better no idea
 	}
 	typeTransformer := swaggerType{}
 	for name, value := range clientReq.Request.Form {
@@ -242,6 +234,19 @@ func (proc SwaggerProcessor) update(clientReq core.ClientRequest) {
 		}
 		reqMethod.Parameters.Merge(paramList)
 	}
+
+	resp := proc.processResponse(clientReq)
+	_, hasResponse := reqMethod.Responses[clientReq.Response.StatusCode]
+	if (!hasResponse) {
+		reqMethod.Responses[clientReq.Response.StatusCode] = resp
+	} else {
+		proc.lock.Lock()
+		respContainer := reqMethod.Responses[clientReq.Response.StatusCode]
+		respContainer.Merge(resp)
+		reqMethod.Responses[clientReq.Response.StatusCode] = respContainer
+		proc.lock.Unlock()
+	}
+
 	proc.doc.Path[requestUri][methodName] = reqMethod
 }
 

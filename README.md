@@ -10,6 +10,7 @@ go run main.go
 Параметры:
  * -cmd-port - порт для api (default 9500)
  * -port - порт прокси сервера (default 9501)
+ * -proxy - прокси, формат: host:port
 
 
 # API

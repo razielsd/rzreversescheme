@@ -72,7 +72,6 @@ func createGetClientReq(url string) core.ClientRequest {
 
 
 func createPostClientReq(reqUrl string, params map[string]string) core.ClientRequest {
-
 	formData := url.Values{}
 	for name, value := range params {
 		formData.Set(name, value)
@@ -91,7 +90,6 @@ func createPostClientReq(reqUrl string, params map[string]string) core.ClientReq
 
 
 func createPostClientReqJson(reqUrl string, body string) core.ClientRequest {
-
 	var clientReq = core.ClientRequest{}
 
 	req, _ := http.NewRequest("POST", reqUrl, bytes.NewBufferString(body))

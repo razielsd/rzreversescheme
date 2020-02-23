@@ -138,9 +138,7 @@ func Test_Swagger_CreateScheme_JsonRpc(t *testing.T) {
 
 
 func Test_JsonSchemaProperty_AddType_int_float(t *testing.T) {
-
 	var prop = NewJsonSchemaProperty()
-
 	prop.addType(SWAGGER_TYPE_INT)
 	prop.addType(SWAGGER_TYPE_NUMBER)
 	assert.Equal(t,"number", prop.Type, "int and number must be cast to number")
@@ -154,5 +152,26 @@ func Test_JsonSchemaProperty_AddType_int_float_string(t *testing.T) {
 	prop.addType(SWAGGER_TYPE_NUMBER)
 	prop.addType(SWAGGER_TYPE_STRING)
 	assert.Equal(t,expected, prop.Type, "int and number must be cast to number")
+}
 
+
+func Test_JsonSchemaProperty_Merge_Two_DifferentStruct(t *testing.T) {
+	var proc = JsonSchema{}
+	var expected = `{
+	   "type":"object",
+	   "properties":{
+		  "id":{
+			 "type":"integer"
+		  },
+		  "username":{
+			 "type":"string"
+		  }
+	   }
+	}`
+	var jsonStr = `{"username": "Vasya"}`
+	var injectStr = `{"username": "Vasya", "id": 45}`
+	prop := proc.CreateFromString(jsonStr)
+	inject := proc.CreateFromString(injectStr)
+	prop.Merge(inject)
+	assert.JSONEq(t, expected, proc.toString(prop))
 }

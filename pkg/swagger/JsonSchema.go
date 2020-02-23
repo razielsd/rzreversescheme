@@ -49,6 +49,17 @@ func (proc JsonSchema) Create(value interface{}) JsonSchemaProperty {
 }
 
 
+func (prop JsonSchemaProperty) Merge(element JsonSchemaProperty) JsonSchemaProperty {
+	for name, inject := range element.Properties {
+		_, hasProp := prop.Properties[name]
+		if (!hasProp) {
+			prop.Properties[name] = inject
+		}
+	}
+	return prop
+}
+
+
 
 func (proc JsonSchema) createArrayFromValue(value interface{}) JsonSchemaProperty {
 	var typeId = SWAGGER_TYPE_NULL
