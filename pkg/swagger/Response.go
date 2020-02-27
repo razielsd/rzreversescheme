@@ -8,6 +8,7 @@ type SwaggerMethodResponse struct {
 
 func NewSwaggerMethodResponse() SwaggerMethodResponse {
 	var resp = SwaggerMethodResponse{}
+	resp.Schema = NewJsonSchemaProperty()
 	return resp
 }
 

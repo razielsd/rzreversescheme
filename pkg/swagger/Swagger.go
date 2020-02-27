@@ -55,18 +55,16 @@ func (proc SwaggerProcessor) Process(clientReq core.ClientRequest) {
 
 func (proc SwaggerProcessor) hasSame(clientReq core.ClientRequest) bool {
 	var path = proc.extractPath(clientReq)
-	if !proc.hasPath(path) {
-		return false
+	if proc.hasPath(path) {
+		return true
 	}
 	return false
 }
 
 
 func (proc SwaggerProcessor) hasPath(path string) bool {
-	if _, ok := proc.doc.Path[path]; ok {
-		return true
-	}
-	return false
+	_, ok := proc.doc.Path[path]
+	return ok
 }
 
 
@@ -221,7 +219,7 @@ func (proc SwaggerProcessor) update(clientReq core.ClientRequest) {
 	var requestUri = proc.extractPath(clientReq)
 	var paramList = RequestParameterList{}
 
-	var methodName = strings.ToUpper(clientReq.Request.Method)
+	var methodName = strings.ToLower(clientReq.Request.Method)
 	var reqMethod = proc.doc.Path[requestUri][methodName]
 	reqMethod.MethodName = methodName
 

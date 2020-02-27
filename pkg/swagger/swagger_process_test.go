@@ -477,6 +477,48 @@ func Test_Swagger_Add_Request_Post_With_JsonBody(t *testing.T) {
 }
 
 
+func Test_Swagger_Add_Request_Post_Without_Parameters_2Req(t *testing.T) {
+	var clientReq = createPostClientReq("/post/one", make(map[string]string))
+	var clientReq2 = createPostClientReq("/post/one", make(map[string]string))
+	clientReq.Response.Body = `{"id": 40}`
+	clientReq2.Response.Body = `{"username": "Petya"}`
+	var proc = NewSwaggerProcessor()
+	proc.Process(clientReq)
+	proc.Process(clientReq2)
+	var expected = `{
+		  "swagger": "2.0",
+		  "info": {
+			"title": "rzreversescheme - swagger scheme generator",
+			"version": "0.0.1a"
+		  },
+		  "paths": {
+			"/post/one": {
+			  "post": {
+				"responses": {
+				  "200": {
+					"description": "Status 200 OK",
+					"schema": {
+					  "type": "object",
+					  "properties": {
+						"id": {
+						  "type": "integer"
+						},
+						"username": {
+						  "type": "string"
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}`
+
+	assert.JSONEq(t, expected, proc.GetScheme(), "Bad scheme for post request")
+}
+
+
 
 //func Test_Swagger_Add_Request_GetPost_OnePath_Without_Parameters(t *testing.T) {
 //	var params = make(map[string]string)
