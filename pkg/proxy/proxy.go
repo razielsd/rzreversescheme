@@ -15,39 +15,47 @@ import (
 	"time"
 )
 
+
+type SchemeProxyServer struct {
+    Server *http.Server
+    RemoteProxyUrl string
+}
+
 var server *http.Server
 var remoteProxyUrl string
 
-func CreateServer(port int) *http.Server {
+func NewProxyServer(port int) SchemeProxyServer {
+    proxy := SchemeProxyServer{}
 	server = &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodConnect {
-				handleTunneling(w, r)
+				proxy.HandleTunneling(w, r)
 			} else {
-				handleHTTP(w, r)
+				proxy.HandleHTTP(w, r)
 			}
 		}),
 		// Disable HTTP/2.
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}
-	return server
+	proxy.Server = server
+
+	return proxy
 }
 
-func SetRemoteProxyUrl(url string) {
-	remoteProxyUrl = url
+func (proxy *SchemeProxyServer) SetRemoteProxyUrl(url string) {
+	proxy.RemoteProxyUrl = url
 }
 
-func Run(proto string, pemPath string, keyPath string) {
-	if proto == "http" {
-		log.Fatal(server.ListenAndServe())
+func (proxy *SchemeProxyServer) Run(proto string, pemPath string, keyPath string) {
+	if proto == "https" {
+        log.Fatal(proxy.Server.ListenAndServeTLS(pemPath, keyPath))
 	} else {
-		log.Fatal(server.ListenAndServeTLS(pemPath, keyPath))
+        log.Fatal(proxy.Server.ListenAndServe())
 	}
-
 }
 
-func handleTunneling(w http.ResponseWriter, r *http.Request) {
+func (proxy *SchemeProxyServer) HandleTunneling(w http.ResponseWriter, r *http.Request) {
 	dest_conn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
@@ -63,21 +71,21 @@ func handleTunneling(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 	}
-	go transfer(dest_conn, client_conn)
-	go transfer(client_conn, dest_conn)
+	go proxy.Transfer(dest_conn, client_conn)
+	go proxy.Transfer(client_conn, dest_conn)
 }
 
-func transfer(destination io.WriteCloser, source io.ReadCloser) {
+func (proxy SchemeProxyServer) Transfer(destination io.WriteCloser, source io.ReadCloser) {
 	defer destination.Close()
 	defer source.Close()
 	io.Copy(destination, source)
 }
 
-func handleHTTP(w http.ResponseWriter, req *http.Request) {
+func (proxy *SchemeProxyServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 	transport := http.Transport{}
-	if (remoteProxyUrl != "") {
+	if (proxy.RemoteProxyUrl != "") {
 		url_i := url.URL{}
-		urlProxy, _ := url_i.Parse(remoteProxyUrl)
+		urlProxy, _ := url_i.Parse(proxy.RemoteProxyUrl)
 		transport.Proxy = http.ProxyURL(urlProxy)// set proxy
 	}
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //set ssl
@@ -88,14 +96,14 @@ func handleHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
-	processRequest(req, resp)
+	proxy.processRequest(req, resp)
 
-	copyHeader(w.Header(), resp.Header)
+	proxy.copyHeader(w.Header(), resp.Header)
 	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
 }
 
-func copyHeader(dst, src http.Header) {
+func (proxy SchemeProxyServer) copyHeader(dst, src http.Header) {
 	for k, vv := range src {
 		for _, v := range vv {
 			dst.Add(k, v)
@@ -103,7 +111,7 @@ func copyHeader(dst, src http.Header) {
 	}
 }
 
-func processRequest(req *http.Request, resp *http.Response) {
+func (proxy *SchemeProxyServer) processRequest(req *http.Request, resp *http.Response) {
 	clientReq := core.ClientRequest{}
 	var bodyBytes []byte
 	bodyBytes, err := ioutil.ReadAll(resp.Body)

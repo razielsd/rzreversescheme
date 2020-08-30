@@ -2,18 +2,14 @@ package main
 
 import (
 	"flag"
-	"log"
+    "fmt"
+    "log"
 	"rzreversescheme/pkg/cmdserver"
 	"rzreversescheme/pkg/processor"
 	"rzreversescheme/pkg/proxy"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
-
-func runProxy(proto string, pemPath string, keyPath string) {
-	proxy.Run(proto, pemPath, keyPath)
-}
-
 
 func main() {
 	var pemPath string
@@ -35,13 +31,18 @@ func main() {
 		log.Fatal("Protocol must be either http or https")
 	}
 
-	proxy.CreateServer(port)
+	server := proxy.NewProxyServer(port)
 	if (proxyUrl != "") {
-		proxy.SetRemoteProxyUrl(proxyUrl)
+		server.SetRemoteProxyUrl(proxyUrl)
 	}
 	processor.Init()
 
-	go runProxy(proto, pemPath, keyPath)
+	fmt.Println("---------------------------------------------")
+	fmt.Printf("Proxy port: %d\n", port)
+    fmt.Printf("Command port: %d\n", cmdPort)
+    fmt.Println("---------------------------------------------")
+
+	go server.Run(proto, pemPath, keyPath)
 
 	releaseMode := gin.ReleaseMode
 	releaseMode = gin.DebugMode // @todo get from config
